@@ -1,9 +1,12 @@
 import React from 'react';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import TenderCard from '../components/TenderCard';
+import CompanyFilter from '../components/CompanyFilter'; 
 
-interface TenderCard {
-  id:number;
+
+interface Tender {
+  id: number;
   title: string;
   description: string;
   deadline: string;
@@ -12,61 +15,100 @@ interface TenderCard {
   companylogourl: string;
 }
 
-const TendersPage = async () => {
+interface Company {
+  id: string;
+  name: string;
+}
+
+interface ApiResponse {
+  tenders: Tender[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export default async function TendersPage({
+  searchParams,
+}: {
+  searchParams: { page?: string; limit?: string; companyId?: string };
+}) {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
 
   if (!token) {
-    return <div>Please login to view tenders</div>;
+    redirect('/login');
   }
 
-  const response = await fetch("http://localhost:8080/tender/list", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    }
-  })
-  const tenders= await response.json();
-  console.log(tenders);
+  const currentPage = await Number(searchParams.page) || 1;
+  const itemsPerPage = await Number(searchParams.limit) || 10;
+  const selectedCompanyId = await searchParams.companyId || '';
+
+  let data: ApiResponse = {
+    tenders: [],
+    total: 0,
+    page: currentPage,
+    limit: itemsPerPage,
+    totalPages: 1,
+  };
+
+  let companies: Company[] = [];
+
+  try {
+    // Fetch companies
+    const companiesRes = await fetch('http://localhost:8080/companies/all', {
+      cache: 'no-store',
+    });
+    companies = await companiesRes.json();
+    console.log(companies);
+    // Fetch tenders
+    const tenderRes = await fetch(
+      `http://localhost:8080/tender/list?page=${currentPage}&limit=${itemsPerPage}&companyId=${selectedCompanyId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }
+    );
+
+    if (!tenderRes.ok) throw new Error('Failed to fetch tenders');
+    data = await tenderRes.json();
+    console.log(data)
+  } catch (err) {
+    console.error('Fetch error:', err);
+  }
 
   return (
-    <>
-      <main className="max-w-[1280px] mx-auto p-6">
-        {/* Search & Filter */}
-        {/* <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
-          <input
-            type="text"
-            placeholder="Search tenders..."
-            className="w-full md:w-1/2 border border-gray-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-black"
-            value={}
-            onChange={e => setSearchTerm(e.target.value)}
-          />
+    <main className="max-w-[1280px] min-h-[calc(100dvh_-_60px)] mx-auto p-6 flex flex-col gap-8">
+      {/* Company Filter Form */}
+      <CompanyFilter companies={companies} selectedCompanyId={selectedCompanyId}/>
 
-          <select
-            className="w-full md:w-1/3 border border-gray-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-black"
-            value={selectedCompany}
-            onChange={e => setSelectedCompany(e.target.value)}
+      {/* Tenders List */}
+      <div className="grid grid-cols-2 gap-6 max-md:grid-cols-1 max-md:place-items-center mb-8">
+        {data.tenders.length > 0 ? (
+          data.tenders.map((tender) => (
+            <TenderCard key={tender.id} {...tender} />
+          ))
+        ) : (
+          <p className="text-center text-zinc-500 col-span-2">No tenders found.</p>
+        )}
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center gap-2">
+        {Array.from({ length: data.totalPages }, (_, i) => i + 1).map((page) => (
+          <a
+            key={page}
+            href={`/tender?page=${page}&limit=${itemsPerPage}&companyId=${selectedCompanyId}`}
+            className={`px-4 py-2 border rounded ${
+              data.page === page ? 'bg-black text-white' : ''
+            }`}
           >
-            {uniqueCompanies.map(company => (
-              <option key={company} value={company}>
-                {company}
-              </option>
-            ))}
-          </select>
-        </div> */}
-
-        {/* Tenders */}
-        <div className="grid grid-cols-2 gap-6 max-md:grid-cols-1 max-md:place-items-center">
-          {tenders.tenders && tenders.tenders.length > 0 ? (
-            tenders.tenders.map((tender, index) => (
-              <TenderCard key={index} {...tender} />
-            ))
-          ) : (
-            <p className="text-center text-zinc-500 col-span-2">No tenders found.</p>
-          )}
-        </div>
-      </main>
-    </>
+            {page}
+          </a>
+        ))}
+      </div>
+    </main>
   );
-};
-
-export default TendersPage;
+}

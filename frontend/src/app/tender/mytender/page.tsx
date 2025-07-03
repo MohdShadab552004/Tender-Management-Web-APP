@@ -1,37 +1,71 @@
-import React from 'react'
-import { cookies } from 'next/headers';
-import TenderCard from '@/app/components/TenderCard';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import MyTenderCard from '@/app/components/MyTenderCard';
 
-const page = async () => {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
+const MyTenderPage = () => {
+  const [tenders, setTenders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    const response = await fetch(`http://localhost:8080/tender/mytender`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
+  useEffect(() => {
+    const fetchTenders = async () => {
+      try {
+        const token = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('token='))
+          ?.split('=')[1];
+
+        if (!token) {
+          console.warn('Token not found in cookies');
+          setTenders([]);
+          setLoading(false);
+          return;
         }
-    })
-    const tenders = await response.json();
-    console.log(tenders)
+
+        const res = await fetch('http://localhost:8080/tender/mytender', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        console.log(data.tenders)
+        setTenders(data.tenders || []);
+      } catch (err) {
+        console.error('Error fetching tenders:', err);
+        setTenders([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTenders();
+  }, []);
 
 
-    return (
-        <div className="max-w-[1280px] mx-auto grid grid-cols-2 gap-6 max-md:grid-cols-1 max-md:place-items-center py-10">
-            {tenders.tenders && tenders.tenders.length > 0 ? (
-                tenders.tenders.map((tender, index) => (
-                    <MyTenderCard
-                        key={index}
-                        tender={tender}
-                        
-                    />
-                ))
-            ) : (
-                <p className="text-center text-zinc-500 col-span-2">No tenders found.</p>
-            )}
-        </div>
+  return (
+    <div className="max-w-[1280px] mx-auto grid grid-cols-3 gap-6 max-md:grid-cols-2 max-md:place-items-center py-10">
+      {loading ? (
+        <p className="text-center text-zinc-500 col-span-2">Loading...</p>
+      ) : tenders.length > 0 ? (
+        tenders.map((tender: any, index: number) => (
+          <MyTenderCard
+            key={index}
+            tender={tender}
+            onDelete={async (id) => {
+              setTenders(prev => prev.filter(t => t.id !== id));
+            }}
+            setTender={(updatedTender) => {
+              setTenders(prev =>
+                prev.map(t => t.id === updatedTender.id ? updatedTender : t)
+              );
+            }} />
+        ))
+      ) : (
+        <p className="text-center text-zinc-500 col-span-2">No tenders found.</p>
+      )}
+    </div>
+  );
+};
 
-    )
-}
-
-export default page
+export default MyTenderPage;

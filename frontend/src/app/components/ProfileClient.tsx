@@ -43,7 +43,6 @@ const ProfileClient: React.FC<ProfileClientProps> = ({ user, setUser }) => {
 
   const handleSave = async () => {
     try {
-        console.log(formData);
       const res = await fetch('http://localhost:8080/profile/edit', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

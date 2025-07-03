@@ -85,3 +85,14 @@ export const searchCompaniesController = async (req, res) => {
     return res.status(500).json({ message: 'Server error' });
   }
 };
+
+
+export const allCompaniesController = async (req,res) => {
+   try {
+    const companies = await db('companies').select('id', 'name');
+    res.json(companies);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching companies' });
+  }
+}

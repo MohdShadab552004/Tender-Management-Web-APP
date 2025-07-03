@@ -66,10 +66,11 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user }) => {
 
           <div className="p-4 border-b">
             <ul className="text-sm text-gray-700 space-y-2">
+              <li className="hover:underline cursor-pointer" onClick={() => router.push('/profile')}>My Profile</li>
               <li className="hover:underline cursor-pointer" onClick={() => router.push('/tender/mytender')}>
                 My Tenders
               </li>
-              <li className="hover:underline cursor-pointer" onClick={() => router.push('/profile')}>My Profile</li>
+              <li className="hover:underline cursor-pointer" onClick={() => router.push('/tender/create')}>Create Tender</li>
             </ul>
           </div>
 
