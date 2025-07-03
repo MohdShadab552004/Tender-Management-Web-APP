@@ -33,7 +33,29 @@ export default function CompanyFilter({
     router.push(`/tender?${params.toString()}`);
   };
 
+  const handleSearch = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+  const params = new URLSearchParams(searchParams.toString());
+  const value = e.target.value;
+
+  if (value) {
+    params.set('search', value); // update the selected company
+  } else {
+    params.delete('search'); // remove filter if nothing selected
+  }
+
+  params.set('page', '1'); // reset to page 1 on search/filter
+
+  router.push(`/tender?${params.toString()}`);
+};
+
   return (
+    <section className='w-full mx-auto py-6 flex justify-between items-center'>
+    <input 
+    type='search' 
+    placeholder='enter company name' 
+    onChange={handleSearch} 
+    className='border w-[350px] h-[50px] shadow rounded px-2'
+    />
     <div className="w-full max-w-xs">
       <label className="block mb-1 text-sm font-medium">Filter by Company</label>
       <select
@@ -49,5 +71,6 @@ export default function CompanyFilter({
         ))}
       </select>
     </div>
+    </section>
   );
 }

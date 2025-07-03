@@ -2,7 +2,7 @@ import React from 'react';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import TenderCard from '../components/TenderCard';
-import CompanyFilter from '../components/CompanyFilter'; 
+import CompanyFilter from '../components/CompanyFilter';
 
 
 interface Tender {
@@ -31,7 +31,7 @@ interface ApiResponse {
 export default async function TendersPage({
   searchParams,
 }: {
-  searchParams: { page?: string; limit?: string; companyId?: string };
+  searchParams: { page?: string; limit?: string; companyId?: string; search?: string };
 }) {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
@@ -43,6 +43,7 @@ export default async function TendersPage({
   const currentPage = await Number(searchParams.page) || 1;
   const itemsPerPage = await Number(searchParams.limit) || 10;
   const selectedCompanyId = await searchParams.companyId || '';
+  const search = await searchParams.search || '';
 
   let data: ApiResponse = {
     tenders: [],
@@ -63,7 +64,7 @@ export default async function TendersPage({
     console.log(companies);
     // Fetch tenders
     const tenderRes = await fetch(
-      `http://localhost:8080/tender/list?page=${currentPage}&limit=${itemsPerPage}&companyId=${selectedCompanyId}`,
+      `http://localhost:8080/tender/list?page=${currentPage}&limit=${itemsPerPage}&companyId=${selectedCompanyId}&search=${search}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -82,7 +83,7 @@ export default async function TendersPage({
   return (
     <main className="max-w-[1280px] min-h-[calc(100dvh_-_60px)] mx-auto p-6 flex flex-col gap-8">
       {/* Company Filter Form */}
-      <CompanyFilter companies={companies} selectedCompanyId={selectedCompanyId}/>
+      <CompanyFilter companies={companies} selectedCompanyId={selectedCompanyId} />
 
       {/* Tenders List */}
       <div className="grid grid-cols-2 gap-6 max-md:grid-cols-1 max-md:place-items-center mb-8">
@@ -96,19 +97,40 @@ export default async function TendersPage({
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-center gap-2 items-center">
+        {/* Prev Button */}
+        {data.page > 1 && (
+          <a
+            href={`/tender?page=${data.page - 1}&limit=${itemsPerPage}&companyId=${selectedCompanyId}&search=${search}`}
+            className="px-4 py-2 border rounded bg-[#ffffff] hover:bg-gray-200"
+          >
+            Prev
+          </a>
+        )}
+
+        {/* Page Numbers */}
         {Array.from({ length: data.totalPages }, (_, i) => i + 1).map((page) => (
           <a
             key={page}
-            href={`/tender?page=${page}&limit=${itemsPerPage}&companyId=${selectedCompanyId}`}
-            className={`px-4 py-2 border rounded ${
-              data.page === page ? 'bg-black text-white' : ''
-            }`}
+            href={`/tender?page=${page}&limit=${itemsPerPage}&companyId=${selectedCompanyId}&search=${search}`}
+            className={`px-4 py-2 border rounded ${data.page === page ? 'bg-black text-white' : 'bg-white text-black'
+              }`}
           >
             {page}
           </a>
         ))}
+
+        {/* Next Button */}
+        {data.page < data.totalPages && (
+          <a
+            href={`/tender?page=${data.page + 1}&limit=${itemsPerPage}&companyId=${selectedCompanyId}&search=${search}`}
+            className="px-4 py-2 border rounded bg-[#ffffff] hover:bg-gray-200"
+          >
+            Next
+          </a>
+        )}
       </div>
+
     </main>
   );
 }

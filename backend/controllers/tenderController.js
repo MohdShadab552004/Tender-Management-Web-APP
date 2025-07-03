@@ -46,7 +46,7 @@ export const listTenderController = async (req, res) => {
 
   // Extract query params
   const {
-    search = '',
+    search,
     companyId,
     page = 1,
     limit = 10
@@ -74,12 +74,15 @@ export const listTenderController = async (req, res) => {
 
     // 🔍 Optional search
     if (search) {
-      query = query.where(builder =>
+      query = query.where((builder) =>
         builder
           .whereILike('tenders.title', `%${search}%`)
           .orWhereILike('tenders.description', `%${search}%`)
+          .orWhereILike('companies.name', `%${search}%`) // 🔥 Added this line
+          .orWhereILike('companies.field', `%${search}%`) // 🔥 Added this line
       );
     }
+
 
     // 🏢 Optional company filter
     if (companyId) {
@@ -219,21 +222,21 @@ export const listTenderIdController = async (req, res) => {
 
 export const updateTenderController = async (req, res) => {
   try {
-    const {title, description, deadline, budget } = req.body;
-    const {tenderId} = req.params;
+    const { title, description, deadline, budget } = req.body;
+    const { tenderId } = req.params;
     console.log("CALLING AND HITTING")
     // Update tender
     const updatedTender = await db('tenders')
-      .where({ id : Number(tenderId) })
+      .where({ id: Number(tenderId) })
       .update({
         title,
         description,
         deadline,
         budget
       })
-      .returning('*'); 
+      .returning('*');
 
-      console.log(updatedTender)
+    console.log(updatedTender)
     if (updatedTender.length === 0) {
       return res.status(404).json({ message: 'Tender not found' });
     }
