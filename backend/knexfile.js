@@ -2,7 +2,7 @@
 export default {
   development: {
     client: 'pg',
-    connection: 'postgresql://postgres:Shad%40b567@db.jylijpgmubfatdaiiwwj.supabase.co:5432/postgres',
+    connection: process.env.DB_URL,
     migrations: {
       directory: './migrations',
     },
