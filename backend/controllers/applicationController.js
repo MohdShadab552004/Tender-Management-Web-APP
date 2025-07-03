@@ -1,4 +1,4 @@
-import { pool } from '../config/db.js';
+import db from '../config/db.js'; 
 
 export const submitProposalsController = async (req, res) => {
   const { tenderId, name, email, bidAmount, coverLetter } = req.body;
@@ -13,23 +13,25 @@ export const submitProposalsController = async (req, res) => {
   }
 
   try {
-    const companyResult = await pool.query(
-      'SELECT id FROM companies WHERE user_id = $1',
-      [userId]
-    );
+    const companyResult = await db('companies')
+      .select('id')
+      .where({ user_id: userId })
+      .first();
 
-    if (companyResult.rows.length === 0) {
+    if (!companyResult) {
       return res.status(404).json({ message: 'No company found for this user.' });
     }
 
-    const companyId = companyResult.rows[0].id;
+    const companyId = companyResult.id;
 
-    await pool.query(
-      `INSERT INTO applications 
-        (tender_id, company_id, name, email, bid_amount, proposal) 
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [tenderId, companyId, name, email, bidAmount, coverLetter]
-    );
+    await db('applications').insert({
+      tender_id: tenderId,
+      company_id: companyId,
+      name,
+      email,
+      bid_amount: bidAmount,
+      proposal: coverLetter
+    });
 
     return res.status(201).json({ message: 'Application submitted successfully!' });
   } catch (err) {
@@ -46,15 +48,12 @@ export const getProposalsController = async (req, res) => {
   }
 
   try {
-    const result = await pool.query(
-      `SELECT id, name, email, bid_amount, proposal, submitted_at 
-       FROM applications 
-       WHERE tender_id = $1`,
-      [tenderId]
-    );
+    const result = await db('applications')
+      .select('id', 'name', 'email', 'bid_amount', 'proposal', 'submitted_at')
+      .where({ tender_id: tenderId });
 
     return res.status(200).json({
-      applications: result.rows,
+      applications: result,
     });
   } catch (error) {
     console.error('Error fetching proposals:', error);

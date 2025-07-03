@@ -1,5 +1,5 @@
-import { pool } from '../config/db.js';
-import supabase from '../config/supabase.js'; 
+import db from '../config/db.js';
+import supabase from '../config/supabase.js';
 import { v4 as uuid } from 'uuid';
 
 export const createCompaniesController = async (req, res) => {
@@ -19,12 +19,9 @@ export const createCompaniesController = async (req, res) => {
   }
 
   try {
-    const existCompany = await pool.query(
-      `SELECT * FROM companies WHERE user_id = $1`,
-      [userId]
-    );
+    const existCompany = await db('companies').where({ user_id: userId }).first();
 
-    if (existCompany.rows.length) {
+    if (existCompany) {
       return res.status(409).json({ message: 'Company already created' });
     }
 
@@ -33,7 +30,7 @@ export const createCompaniesController = async (req, res) => {
     const fileName = `${uuid()}.${fileExt}`;
 
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('logo') // your Supabase bucket
+      .from('logo')
       .upload(fileName, file.buffer, {
         contentType: file.mimetype,
       });
@@ -49,23 +46,25 @@ export const createCompaniesController = async (req, res) => {
 
     const logo_url = publicUrlData?.publicUrl;
 
-    // 👇 Step 4: Insert into database
-    const result = await pool.query(
-      `INSERT INTO companies (user_id, name, industry, description, logo_url)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [userId, name, industry, description, logo_url]
-    );
+    const [newCompany] = await db('companies')
+      .insert({
+        user_id: userId,
+        name,
+        industry,
+        description,
+        logo_url,
+      })
+      .returning('*');
 
     return res.status(201).json({
       message: 'Company created successfully',
-      company: result.rows[0],
+      company: newCompany,
     });
   } catch (err) {
     console.error('❌ Error creating company:', err.message);
     return res.status(500).json({ message: 'Server error' });
   }
 };
-
 
 export const searchCompaniesController = async (req, res) => {
   const { query } = req.query;
@@ -75,18 +74,14 @@ export const searchCompaniesController = async (req, res) => {
   }
 
   try {
-    const result = await pool.query(
-      `SELECT * FROM companies
-       WHERE LOWER(name) ILIKE LOWER($1)
-          OR LOWER(industry) ILIKE LOWER($1)
-          OR LOWER(description) ILIKE LOWER($1)`,
-      [`%${query}%`]
-    );
+    const result = await db('companies')
+      .whereILike('name', `%${query}%`)
+      .orWhereILike('industry', `%${query}%`)
+      .orWhereILike('description', `%${query}%`);
 
-    return res.status(200).json({ companies: result.rows });
+    return res.status(200).json({ companies: result });
   } catch (err) {
     console.error('❌ Error searching companies:', err.message);
     return res.status(500).json({ message: 'Server error' });
   }
 };
-

@@ -1,52 +1,80 @@
-const createSchema = () => {
-  return `
-CREATE TABLE IF NOT EXISTS users (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(100) UNIQUE NOT NULL,
-  password TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW()
-);
+// migration: create_all_tables.js
 
-CREATE TABLE IF NOT EXISTS companies (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-  name VARCHAR(150) NOT NULL,
-  industry VARCHAR(100),
-  description TEXT,
-  logo_url TEXT,
-  created_at TIMESTAMP DEFAULT NOW()
-);
+export async function up(knex) {
+  // Users table
+  await knex.schema.createTable('users', (table) => {
+    table.increments('id').primary();
+    table.string('email', 100).notNullable().unique();
+    table.text('password').notNullable();
+    table.timestamp('created_at').defaultTo(knex.fn.now());
+  });
 
-CREATE TABLE IF NOT EXISTS goods_services (
-  id SERIAL PRIMARY KEY,
-  company_id INTEGER REFERENCES companies(id) ON DELETE CASCADE,
-  name VARCHAR(150) NOT NULL
-);
+  // Companies table
+  await knex.schema.createTable('companies', (table) => {
+    table.increments('id').primary();
+    table
+      .integer('user_id')
+      .references('id')
+      .inTable('users')
+      .onDelete('CASCADE');
+    table.string('name', 150).notNullable();
+    table.string('industry', 100);
+    table.text('description');
+    table.text('logo_url');
+    table.timestamp('created_at').defaultTo(knex.fn.now());
+  });
 
-CREATE TABLE IF NOT EXISTS tenders (
-  id SERIAL PRIMARY KEY,
-  company_id INTEGER REFERENCES companies(id) ON DELETE CASCADE,
-  title VARCHAR(150) NOT NULL,
-  description TEXT,
-  deadline DATE,
-  budget NUMERIC,
-  created_at TIMESTAMP DEFAULT NOW()
-);
+  // Goods & Services
+  await knex.schema.createTable('goods_services', (table) => {
+    table.increments('id').primary();
+    table
+      .integer('company_id')
+      .references('id')
+      .inTable('companies')
+      .onDelete('CASCADE');
+    table.string('name', 150).notNullable();
+  });
 
-CREATE TABLE IF NOT EXISTS applications (
-  id SERIAL PRIMARY KEY,
-  tender_id INTEGER REFERENCES tenders(id) ON DELETE CASCADE,
-  company_id INTEGER REFERENCES companies(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  email TEXT NOT NULL,
-  bid_amount NUMERIC(12,2) NOT NULL,
-  proposal TEXT NOT NULL,
-  submitted_at TIMESTAMP DEFAULT NOW()
-);
+  // Tenders
+  await knex.schema.createTable('tenders', (table) => {
+    table.increments('id').primary();
+    table
+      .integer('company_id')
+      .references('id')
+      .inTable('companies')
+      .onDelete('CASCADE');
+    table.string('title', 150).notNullable();
+    table.text('description');
+    table.date('deadline');
+    table.decimal('budget');
+    table.timestamp('created_at').defaultTo(knex.fn.now());
+  });
 
+  // Applications
+  await knex.schema.createTable('applications', (table) => {
+    table.increments('id').primary();
+    table
+      .integer('tender_id')
+      .references('id')
+      .inTable('tenders')
+      .onDelete('CASCADE');
+    table
+      .integer('company_id')
+      .references('id')
+      .inTable('companies')
+      .onDelete('CASCADE');
+    table.text('name').notNullable();
+    table.text('email').notNullable();
+    table.decimal('bid_amount', 12, 2).notNullable();
+    table.text('proposal').notNullable();
+    table.timestamp('submitted_at').defaultTo(knex.fn.now());
+  });
+}
 
-
-`;
-};
-
-export default createSchema;
+export async function down(knex) {
+  await knex.schema.dropTableIfExists('applications');
+  await knex.schema.dropTableIfExists('tenders');
+  await knex.schema.dropTableIfExists('goods_services');
+  await knex.schema.dropTableIfExists('companies');
+  await knex.schema.dropTableIfExists('users');
+}
