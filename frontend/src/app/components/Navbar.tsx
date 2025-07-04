@@ -10,11 +10,28 @@ const NAV_LINKS = [
   { href: '/tender', label: 'Tenders' },
 ];
 
+interface Company {
+  name: string;
+  industry: string;
+  description: string;
+  logo_url?: string;
+  tendersPosted?: number;
+  applicationsSent?: number;
+}
+
+interface User {
+  email: string;
+  joined?: string;
+  totalBidding: number;
+  company: Company;
+}
+
+
 const Navbar = () => {
   const pathname = usePathname();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [loadingUser, setLoadingUser] = useState(false);
 

@@ -50,7 +50,7 @@ const ProfileClient: React.FC<ProfileClientProps> = ({ user, setUser }) => {
 
     if (name.startsWith('company.')) {
       const field = name.split('.')[1];
-      setFormData((prev: any) => ({
+      setFormData((prev) => ({
         ...prev,
         company: {
           ...prev.company,
