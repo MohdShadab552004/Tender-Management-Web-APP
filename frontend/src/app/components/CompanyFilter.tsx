@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 interface Company {
@@ -18,9 +18,36 @@ export default function CompanyFilter({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery); // 🌀 debounced value
+
+  // ⏱ Debounce effect: delay updating the URL until user stops typing
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500); // 500ms debounce delay
+
+    return () => clearTimeout(handler); // Cleanup timeout on change
+  }, [searchQuery]);
+
+  // 🌐 Update URL when debounced search value changes
+  useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
+
+    if (debouncedSearch) {
+      params.set('search', debouncedSearch);
+    } else {
+      params.delete('search');
+    }
+
+    params.set('page', '1');
+    router.push(`/tender?${params.toString()}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
+
+  const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
+    const params = new URLSearchParams(searchParams.toString());
 
     if (value) {
       params.set('companyId', value);
@@ -29,37 +56,24 @@ export default function CompanyFilter({
     }
 
     params.set('page', '1');
-
-    router.push(`/tender?${params.toString()}`);
-  };
-
-  const handleSearch = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-    const params = new URLSearchParams(searchParams.toString());
-    const value = e.target.value;
-
-    if (value) {
-      params.set('search', value);
-    } else {
-      params.delete('search');
-    }
-    params.set('page', '1');
-
     router.push(`/tender?${params.toString()}`);
   };
 
   return (
-    <section className='w-full mx-auto py-6 flex justify-between items-center max-md:flex-col gap-4'>
+    <section className="w-full mx-auto py-6 flex justify-between items-center max-md:flex-col gap-4">
       <input
-        type='search'
-        placeholder='enter company name'
-        onChange={handleSearch}
-        className='border w-[350px] h-[50px] shadow rounded px-2 max-[400px]:w-full'
+        type="search"
+        placeholder="Enter keyword or company name"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="border w-[350px] h-[50px] shadow rounded px-3 max-[400px]:w-full"
       />
-      <div className="w-full max-w-xs ">
+
+      <div className="w-full max-w-xs">
         <label className="block mb-1 text-sm font-medium">Filter by Company</label>
         <select
           value={selectedCompanyId}
-          onChange={handleChange}
+          onChange={handleCompanyChange}
           className="w-full border border-gray-300 rounded p-2"
         >
           <option value="">All Companies</option>

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import InputField from '../components/InputField';
+import Image from 'next/image';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -70,9 +71,8 @@ const LoginPage = () => {
 
           <button
             type="submit"
-            className={`w-full h-[50px] rounded-xl bg-black text-white flex items-center justify-center gap-2 ${
-              loading ? 'opacity-60 cursor-not-allowed' : ''
-            }`}
+            className={`w-full h-[50px] rounded-xl bg-black text-white flex items-center justify-center gap-2 ${loading ? 'opacity-60 cursor-not-allowed' : ''
+              }`}
             disabled={loading}
           >
             {loading ? (
@@ -95,10 +95,12 @@ const LoginPage = () => {
       </section>
 
       <section className="w-1/2 h-[500px] flex items-center justify-center max-md:w-full">
-        <img
+        <Image
           src="/images/login-image.png"
           alt="login photo"
-          className="w-full h-full object-center"
+          width={500}
+          height={500}
+          className=" object-center"
         />
       </section>
     </main>

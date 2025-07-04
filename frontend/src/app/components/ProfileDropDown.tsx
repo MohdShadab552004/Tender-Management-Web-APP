@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { set } from 'react-hook-form';
+import Image from 'next/image';
 
 interface ProfileDropdownProps {
   user: {
@@ -44,45 +44,47 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, setIsLoggedIn }
         className="w-[50px] h-[50px] rounded-full overflow-hidden cursor-pointer border"
         onClick={toggleDropdown}
       >
-        <img
+        <Image
           src={user.company?.logo_url || '/images/hero-images.png'}
           alt="avatar"
-          className="w-full h-full object-cover"
+          width={50}
+          height={50}
+          className="rounded-full object-cover"
         />
       </li>
 
       {isOpen && (
         <div className="absolute top-14 right-0 bg-white rounded-xl shadow-lg w-[280px] z-50">
-          
-            <div className="flex gap-4 items-center p-4 border-b">
-              <img
-                src={user.company?.logo_url || '/images/hero-images.png'}
-                alt="Profile"
-                className="w-12 h-12 rounded-full object-cover"
-              />
-              <div>
-                <h2 className="font-semibold">{user.company?.name}</h2>
-                <p className="text-sm text-gray-500">{user.email}</p>
-              </div>
+
+          <div className="flex gap-4 items-center p-4 border-b">
+            <img
+              src={user.company?.logo_url || '/images/hero-images.png'}
+              alt="Profile"
+              className="w-12 h-12 rounded-full object-cover"
+            />
+            <div>
+              <h2 className="font-semibold">{user.company?.name}</h2>
+              <p className="text-sm text-gray-500">{user.email}</p>
             </div>
-          
+          </div>
+
 
           <div className="p-4 border-b">
             <ul className="text-sm text-gray-700 space-y-2">
-              <li className="hover:underline cursor-pointer" onClick={() => { 
-                 router.push('/profile')
-                 setIsOpen(false);
-                 }}>My Profile</li>
-              <li className="hover:underline cursor-pointer" onClick={() => { 
-                 router.push('/tender/mytender')
-                 setIsOpen(false);
-                 }}>
+              <li className="hover:underline cursor-pointer" onClick={() => {
+                router.push('/profile')
+                setIsOpen(false);
+              }}>My Profile</li>
+              <li className="hover:underline cursor-pointer" onClick={() => {
+                router.push('/tender/mytender')
+                setIsOpen(false);
+              }}>
                 My Tenders
               </li>
-              <li className="hover:underline cursor-pointer" onClick={() => { 
+              <li className="hover:underline cursor-pointer" onClick={() => {
                 router.push('/tender/create')
                 setIsOpen(false);
-                }}>Create Tender</li>
+              }}>Create Tender</li>
             </ul>
           </div>
 

@@ -1,34 +1,40 @@
 'use client';
+
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 
+interface TenderType {
+  id: number;
+  title: string;
+  description: string;
+  deadline: string;
+  budget: string;
+  applicationCount?: number;
+}
+
 interface MyTenderCardProps {
-  tender: {
-    id: number;
-    title: string;
-    description: string;
-    deadline: string;
-    budget: string;
-    applicationCount?: number;
-  };
+  tender: TenderType;
   onDelete?: (id: number) => Promise<void>;
-  setTender: (tender: any) => void; 
+  setTender: (updatedTender: TenderType) => void;
 }
 
 const MyTenderCard: React.FC<MyTenderCardProps> = ({ tender, onDelete, setTender }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [formData, setFormData] = useState({
-    title: tender.title || '',
-    description: tender.description || '',
+    title: tender.title,
+    description: tender.description,
     deadline: tender.deadline,
-    budget: tender.budget || '',
+    budget: tender.budget,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -37,8 +43,9 @@ const MyTenderCard: React.FC<MyTenderCardProps> = ({ tender, onDelete, setTender
   };
 
   const handleSave = async () => {
+    setIsSaving(true);
     try {
-      const res = await fetch(`http://localhost:8080/tender/edit/${tender.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tender/edit/${tender.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -54,11 +61,9 @@ const MyTenderCard: React.FC<MyTenderCardProps> = ({ tender, onDelete, setTender
     } catch (error) {
       console.error(error);
       toast.error('Error updating tender');
+    } finally {
+      setIsSaving(false);
     }
-  };
-
-  const handleClose = () => {
-    setIsEditing(false);
   };
 
   const handleDelete = async () => {
@@ -66,29 +71,30 @@ const MyTenderCard: React.FC<MyTenderCardProps> = ({ tender, onDelete, setTender
 
     setIsDeleting(true);
     try {
-      const res = await fetch(`http://localhost:8080/tender/delete/${tender.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tender/delete/${tender.id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
       });
 
-      if (!res.ok) throw new Error('Failed to update tender');
+      if (!res.ok) throw new Error('Failed to delete tender');
 
       const deleted = await res.json();
-      onDelete(deleted?.deletedTender?.id);
-      setIsDeleting(false);
-      setShowDeleteConfirm(false);
-      toast.success('Tender updated successfully');
+      await onDelete(deleted?.deletedTender?.id);
+      toast.success('Tender deleted successfully');
     } catch (error) {
       console.error(error);
-      toast.error('Error updating tender');
+      toast.error('Error deleting tender');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
     }
   };
 
   return (
     <div className="bg-white shadow-md rounded-xl p-6 mb-4 border border-gray-200 relative">
-      <h5 className="font-bold text-xl text-[#000000]">{`#${tender.id}`}</h5>
-      <h2 className="text-xl font-bold text-[#000000]">{tender.title}</h2>
+      <h5 className="font-bold text-xl text-black">{`#${tender.id}`}</h5>
+      <h2 className="text-xl font-bold text-black">{tender.title}</h2>
       <p className="text-gray-700 mt-2">{tender.description}</p>
 
       <div className="mt-4 text-sm text-gray-500 space-y-1">
@@ -147,7 +153,6 @@ const MyTenderCard: React.FC<MyTenderCardProps> = ({ tender, onDelete, setTender
         )}
       </div>
 
-      {/* Edit Modal */}
       {isEditing && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-lg border border-zinc-300">
@@ -186,16 +191,17 @@ const MyTenderCard: React.FC<MyTenderCardProps> = ({ tender, onDelete, setTender
 
             <div className="mt-6 flex justify-end gap-4">
               <button
-                onClick={handleClose}
+                onClick={() => setIsEditing(false)}
                 className="px-4 py-2 border border-zinc-300 rounded hover:bg-zinc-100"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-zinc-900 text-white rounded hover:bg-zinc-800"
+                disabled={isSaving}
+                className="px-4 py-2 bg-zinc-900 text-white rounded hover:bg-zinc-800 disabled:opacity-50"
               >
-                Save
+                {isSaving ? 'Saving...' : 'Save'}
               </button>
             </div>
           </div>

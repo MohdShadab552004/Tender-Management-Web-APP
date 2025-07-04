@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import ProfileDropdown from './ProfileDropDown';
 
@@ -12,35 +12,55 @@ const NAV_LINKS = [
 
 const Navbar = () => {
   const pathname = usePathname();
+  const router = useRouter();
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(false);
 
+  // Check token from cookies in client-side only
   useEffect(() => {
-    const token = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('token='));
-    setIsLoggedIn(!!token);
+    const checkAuth = () => {
+      const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='));
+      setIsLoggedIn(!!token);
+    };
+    checkAuth();
   }, []);
 
+  // Fetch user profile if logged in
   useEffect(() => {
     const fetchUserProfile = async () => {
+      setLoadingUser(true);
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile`, {
-          method: 'GET',
           credentials: 'include',
         });
 
-        if (!res.ok) throw new Error('Failed to fetch user profile');
+        if (!res.ok) {
+          setIsLoggedIn(false);
+          return;
+        }
+
         const data = await res.json();
         setUser(data);
       } catch (err) {
         console.error('❌ Error fetching user profile:', err);
+        setIsLoggedIn(false);
+      } finally {
+        setLoadingUser(false);
       }
     };
 
     if (isLoggedIn) fetchUserProfile();
   }, [isLoggedIn]);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
 
   const isActive = (route: string) => pathname === route;
 
@@ -74,7 +94,9 @@ const Navbar = () => {
         {/* RIGHT: Auth or Profile */}
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-4">
-            {!isLoggedIn ? (
+            {loadingUser ? (
+              <span className="text-zinc-500">Loading...</span>
+            ) : !isLoggedIn ? (
               <>
                 <Link href="/login" className="text-zinc-600 hover:text-black">
                   Log in
@@ -87,24 +109,19 @@ const Navbar = () => {
                 </Link>
               </>
             ) : (
-              user && <ProfileDropdown user={user} setIsLoggedIn={setIsLoggedIn}/>
+              user && <ProfileDropdown user={user} setIsLoggedIn={setIsLoggedIn} />
             )}
           </div>
 
-          {/* Hamburger (mobile) */}
+          {/* Hamburger Icon (mobile) */}
           <button
             className="md:hidden text-2xl text-black"
+            aria-label="Toggle menu"
+            aria-expanded={isMenuOpen}
             onClick={() => setIsMenuOpen((prev) => !prev)}
           >
             ☰
           </button>
-
-          {/* Mobile Profile (if logged in) */}
-          {isLoggedIn && user && (
-            <div className="md:hidden">
-              <ProfileDropdown user={user} setIsLoggedIn={setIsLoggedIn}/>
-            </div>
-          )}
         </div>
       </nav>
 
@@ -139,6 +156,12 @@ const Navbar = () => {
               >
                 Sign up
               </Link>
+            </div>
+          )}
+
+          {isLoggedIn && user && (
+            <div className="pt-4 border-t mt-4">
+              <ProfileDropdown user={user} setIsLoggedIn={setIsLoggedIn} />
             </div>
           )}
         </div>

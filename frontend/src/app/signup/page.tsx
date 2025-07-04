@@ -4,6 +4,7 @@ import React, { FormEvent, useState } from 'react';
 import InputField from '../components/InputField';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const Page = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -193,8 +194,8 @@ const Page = () => {
       </section>
 
       {/* Image Section */}
-      <section className="w-1/2 h-[500px] max-md:w-full">
-        <img src="/images/signup-image.png" alt="signup photo" className="w-full h-full object-center" />
+      <section className="w-1/2 h-[500px] max-md:w-full ">
+        <Image src="/images/signup-image.png" alt="signup photo" width={500} height={500} className="object-center" />
       </section>
     </main>
   );

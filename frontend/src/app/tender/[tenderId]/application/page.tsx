@@ -1,6 +1,12 @@
 import { cookies } from 'next/headers';
 
-const ApplicationsPage = async ({ params }) => {
+interface ApplicationsPageProps {
+  params: {
+    tenderId: string;
+  };
+}
+
+const ApplicationsPage = async ({ params }: ApplicationsPageProps) => {
     console.log(params.tenderId)
  const tenderId = params.tenderId;
    const cookieStore = await cookies();

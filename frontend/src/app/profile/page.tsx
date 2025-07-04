@@ -5,8 +5,18 @@ import ProfileClient from '../components/ProfileClient';
 import ProfileShimmer from '../components/ProfileShimmer';
 import { useRouter } from 'next/navigation';
 
+interface UserProfile {
+  email: string;
+  joined: string;
+  company: {
+    name: string;
+    logo_url?: string;
+  };
+}
+
+
 const ProfilePage = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +49,7 @@ const ProfilePage = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, [router]);
 
   if (loading) return <div className="p-10 text-center"><ProfileShimmer /></div>;
   if (error) return <div className="p-10 text-red-500">{error}</div>;
