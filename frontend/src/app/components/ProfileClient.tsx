@@ -58,7 +58,7 @@ const ProfileClient: React.FC<ProfileClientProps> = ({ user, setUser }) => {
         },
       }));
     } else {
-      setFormData((prev: any) => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
