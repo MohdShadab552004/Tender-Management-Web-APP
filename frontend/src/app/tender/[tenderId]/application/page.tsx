@@ -1,10 +1,5 @@
 import { cookies } from 'next/headers';
 
-interface ApplicationsPageProps {
-  params: {
-    tenderId: number | string;
-  };
-}
 
 interface Application {
   name: string;
@@ -18,12 +13,13 @@ interface ApplicationResponse {
   applications: Application[];
 }
 
-
-
-const ApplicationsPage = async ({ params }: ApplicationsPageProps) => {
-    console.log(params.tenderId)
- const tenderId = params.tenderId;
-   const cookieStore = await cookies();
+const ApplicationsPage = async ({
+    params,
+  }: {
+    params: Promise<{ tenderId: string }>;
+  }) => {
+  const {tenderId}= await params;
+  const cookieStore = await cookies();
   const token = await cookieStore.get('token')?.value;
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/application/${tenderId}`, {
@@ -41,7 +37,7 @@ const ApplicationsPage = async ({ params }: ApplicationsPageProps) => {
 
       {data.applications?.length > 0 ? (
         <div className="space-y-6">
-          {data.applications.map((app : Application, index : number) => (
+          {data.applications.map((app: Application, index: number) => (
             <div
               key={index}
               className="bg-white border border-zinc-200 rounded-lg p-6 shadow-sm"

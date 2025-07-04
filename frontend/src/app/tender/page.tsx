@@ -29,9 +29,10 @@ interface ApiResponse {
 }
 
 export default async function TendersPage({
+  
   searchParams,
 }: {
-  searchParams: { page?: string; limit?: string; companyId?: string; search?: string };
+  searchParams: Promise<{ page?: string; limit?: string; companyId?: string; search?: string }>;
 }) {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
@@ -40,10 +41,12 @@ export default async function TendersPage({
     redirect('/login');
   }
 
-  const currentPage = await Number(searchParams.page) || 1;
-  const itemsPerPage = await Number(searchParams.limit) || 10;
-  const selectedCompanyId = await searchParams.companyId || '';
-  const search = await searchParams.search || '';
+  const {page, limit, companyId, search = ''} = await searchParams;
+
+  const currentPage = Number(page) || 1;
+  const itemsPerPage = Number(limit) || 10;
+  const selectedCompanyId = companyId || '';
+  
 
   let data: ApiResponse = {
     tenders: [],
