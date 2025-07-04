@@ -1,32 +1,19 @@
 'use client';
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { IUserProfile } from '../profile/page'; // Adjust the import path as necessary
 
-
-interface UserProfile {
-  email: string;
-  joined?: string;
-  totalBidding: number;
-  company: {
-    name: string;
-    industry: string;
-    description: string;
-    logo_url?: string;
-    tendersPosted?: number;
-    applicationsSent?: number;
-  };
-}
 
 interface ProfileClientProps {
-  user: UserProfile;
-  setUser: React.Dispatch<React.SetStateAction<UserProfile>>;
+  user: IUserProfile;
+  setUser: React.Dispatch<React.SetStateAction<IUserProfile | null>>;
 }
 
 
 
 const ProfileClient: React.FC<ProfileClientProps> = ({ user, setUser }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<UserProfile>({
+  const [formData, setFormData] = useState<IUserProfile>({
     email: user.email,
     company: {
       name: user.company?.name || '',

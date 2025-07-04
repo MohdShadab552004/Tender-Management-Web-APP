@@ -5,18 +5,23 @@ import ProfileClient from '../components/ProfileClient';
 import ProfileShimmer from '../components/ProfileShimmer';
 import { useRouter } from 'next/navigation';
 
-interface UserProfile {
+export interface IUserProfile {
   email: string;
-  joined: string;
+  joined?: string;
+  totalBidding: number;
   company: {
     name: string;
+    industry?: string;
+    description?: string;
     logo_url?: string;
+    tendersPosted?: number;
+    applicationsSent?: number;
   };
 }
 
 
 const ProfilePage = () => {
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<IUserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

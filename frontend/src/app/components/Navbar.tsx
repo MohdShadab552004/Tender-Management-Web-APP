@@ -4,34 +4,27 @@ import Link from 'next/link';
 import { usePathname, } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import ProfileDropdown from './ProfileDropDown';
+import { IUserProfile } from '../profile/page';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/tender', label: 'Tenders' },
 ];
 
-interface Company {
-  name: string;
-  industry: string;
-  description: string;
-  logo_url?: string;
-  tendersPosted?: number;
-  applicationsSent?: number;
-}
-
-interface User {
-  email: string;
-  joined?: string;
-  totalBidding: number;
-  company: Company;
-}
-
+interface IUserDropDown {
+    email: string;
+    joined: string;
+    company: {
+      name: string;
+      logo_url?: string;
+    };
+  };
 
 const Navbar = () => {
   const pathname = usePathname();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<IUserDropDown | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [loadingUser, setLoadingUser] = useState(false);
 

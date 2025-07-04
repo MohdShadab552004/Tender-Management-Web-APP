@@ -2,9 +2,23 @@ import { cookies } from 'next/headers';
 
 interface ApplicationsPageProps {
   params: {
-    tenderId: string;
+    tenderId: number | string;
   };
 }
+
+interface Application {
+  name: string;
+  email: string;
+  bid_amount: number;
+  proposal: string;
+  submitted_at: string;
+}
+
+interface ApplicationResponse {
+  applications: Application[];
+}
+
+
 
 const ApplicationsPage = async ({ params }: ApplicationsPageProps) => {
     console.log(params.tenderId)
@@ -18,7 +32,7 @@ const ApplicationsPage = async ({ params }: ApplicationsPageProps) => {
     }
   });
 
-  const data = await res.json();
+  const data: ApplicationResponse = await res.json();
   console.log(data)
 
   return (
@@ -27,7 +41,7 @@ const ApplicationsPage = async ({ params }: ApplicationsPageProps) => {
 
       {data.applications?.length > 0 ? (
         <div className="space-y-6">
-          {data.applications.map((app, index) => (
+          {data.applications.map((app : Application, index : number) => (
             <div
               key={index}
               className="bg-white border border-zinc-200 rounded-lg p-6 shadow-sm"
