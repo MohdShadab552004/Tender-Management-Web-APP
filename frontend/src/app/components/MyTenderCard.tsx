@@ -1,8 +1,6 @@
 'use client';
-
 import Link from 'next/link';
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 
 interface MyTenderCardProps {
@@ -15,7 +13,7 @@ interface MyTenderCardProps {
     applicationCount?: number;
   };
   onDelete?: (id: number) => Promise<void>;
-  setTender: (tender: any) => void; // This should match
+  setTender: (tender: any) => void; 
 }
 
 const MyTenderCard: React.FC<MyTenderCardProps> = ({ tender, onDelete, setTender }) => {
@@ -151,9 +149,9 @@ const MyTenderCard: React.FC<MyTenderCardProps> = ({ tender, onDelete, setTender
 
       {/* Edit Modal */}
       {isEditing && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-lg border border-zinc-300">
-            <h2 className="text-xl font-bold mb-4">Edit Tender</h2>
+            <h2 className="text-xl font-bold mb-4">Edit Tender #{tender.id}</h2>
             <div className="space-y-4">
               <input
                 name="title"

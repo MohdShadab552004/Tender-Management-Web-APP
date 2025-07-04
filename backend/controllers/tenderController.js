@@ -52,6 +52,8 @@ export const listTenderController = async (req, res) => {
     limit = 10
   } = req.query;
 
+  console.log(search, companyId, page, limit);
+
   const pageNumber = Math.max(1, parseInt(page));
   const limitNumber = Math.min(6, Math.max(1, parseInt(limit)));
   const offset = (pageNumber - 1) * limitNumber;

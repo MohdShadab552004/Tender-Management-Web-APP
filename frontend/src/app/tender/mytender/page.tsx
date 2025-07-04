@@ -3,9 +3,26 @@
 import React, { useEffect, useState } from 'react';
 import MyTenderCard from '@/app/components/MyTenderCard';
 
+interface TenderType {
+  id: number;
+  title: string;
+  description: string;
+  deadline: string;
+  budget: string;
+  applicationCount?: number;
+}
+
 const MyTenderPage = () => {
-  const [tenders, setTenders] = useState([]);
+  const [tenders, setTenders] = useState<TenderType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const tendersPerPage = 6;
+
+  const indexOfLast = currentPage * tendersPerPage;
+  const indexOfFirst = indexOfLast - tendersPerPage;
+  const currentTenders = tenders.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(tenders.length / tendersPerPage);
 
   useEffect(() => {
     const fetchTenders = async () => {
@@ -29,7 +46,6 @@ const MyTenderPage = () => {
         });
 
         const data = await res.json();
-        console.log(data.tenders)
         setTenders(data.tenders || []);
       } catch (err) {
         console.error('Error fetching tenders:', err);
@@ -42,27 +58,70 @@ const MyTenderPage = () => {
     fetchTenders();
   }, []);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [tenders.length]);
 
   return (
-    <div className="max-w-[1280px] mx-auto grid grid-cols-3 gap-6 max-md:grid-cols-2 max-md:place-items-center py-10">
-      {loading ? (
-        <p className="text-center text-zinc-500 col-span-2">Loading...</p>
-      ) : tenders.length > 0 ? (
-        tenders.map((tender: any, index: number) => (
-          <MyTenderCard
-            key={index}
-            tender={tender}
-            onDelete={async (id) => {
-              setTenders(prev => prev.filter(t => t.id !== id));
-            }}
-            setTender={(updatedTender) => {
-              setTenders(prev =>
-                prev.map(t => t.id === updatedTender.id ? updatedTender : t)
-              );
-            }} />
-        ))
-      ) : (
-        <p className="text-center text-zinc-500 col-span-2">No tenders found.</p>
+    <div className="max-w-[1280px] min-h-[calc(100dvh_-_60px)] flex flex-col justify-between mx-auto py-10 ">
+      <div className="grid grid-cols-3 gap-6 max-lg:grid-cols-2 max-lg:place-items-center max-md:grid-cols-1">
+        {loading ? (
+          <p className="text-center text-zinc-500 col-span-full">Loading...</p>
+        ) : currentTenders.length > 0 ? (
+          currentTenders.map((tender) => (
+            <MyTenderCard
+              key={tender.id}
+              tender={tender}
+              onDelete={async (id) => {
+                setTenders(prev => prev.filter(t => t.id !== id));
+              }}
+              setTender={(updatedTender) => {
+                setTenders(prev =>
+                  prev.map(t => t.id === updatedTender.id ? updatedTender : t)
+                );
+              }}
+            />
+          ))
+        ) : (
+          <p className="text-center text-zinc-500 col-span-full">No tenders found.</p>
+        )}
+      </div>
+
+      {/* Pagination */}
+      {!loading && totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-8 flex-wrap">
+          {/* Prev Button */}
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1.5 border rounded bg-white hover:bg-zinc-100 disabled:opacity-50"
+          >
+            Prev
+          </button>
+
+          {/* Page Numbers */}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`px-4 py-2 rounded border 
+                ${page === currentPage
+                  ? 'bg-black text-white'
+                  : 'bg-white text-black hover:bg-zinc-100'}`}
+            >
+              {page}
+            </button>
+          ))}
+
+          {/* Next Button */}
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1.5 border rounded bg-white hover:bg-zinc-100 disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       )}
     </div>
   );

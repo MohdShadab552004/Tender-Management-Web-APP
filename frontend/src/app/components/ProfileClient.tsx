@@ -111,13 +111,13 @@ const ProfileClient: React.FC<ProfileClientProps> = ({ user, setUser }) => {
             <h3 className="text-lg font-bold">₹{user.totalBidding}</h3>
             <p className="text-sm text-zinc-500">Total Bids</p>
           </div>
-          
+
         </div>
       </div>
 
       {/* Edit Modal */}
       {isEditing && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-lg border border-zinc-300">
             <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
             <div className="space-y-4">

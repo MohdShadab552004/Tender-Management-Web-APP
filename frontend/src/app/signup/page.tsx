@@ -58,9 +58,9 @@ const Page = () => {
 
   return (
     <>
-      <main className="max-w-[1280px] mx-auto h-[calc(100dvh_-_60px)] flex py-28 max-lg:flex-col">
+      <main className="max-w-[1280px] mx-auto h-[calc(100dvh_-_60px)] flex py-28 max-lg:flex-col gap-10 items-center px-6">
         {/* SIGNUP FORM */}
-        <section className={`w-1/2 ${!isSignUp ? 'flex' : 'hidden'} flex-col gap-5 justify-center`}>
+        <section className={`w-1/2 ${!isSignUp ? 'flex' : 'hidden'} flex-col gap-5 justify-center max-md:w-full`}>
           <h2 className="text-4xl font-bold text-center">Sign Up</h2>
           <p className="text-zinc-500 text-center text-xl">Create your new account</p>
 
@@ -144,7 +144,7 @@ const Page = () => {
         </section>
 
         {/* Just Placeholder */}
-        <section className="w-1/2">
+        <section className="w-1/2 h-[500px] max-md:w-full">
         <img src="/images/signup-image.png" alt="signup photo" className='w-full h-full object-center'/>
         </section>
       </main>

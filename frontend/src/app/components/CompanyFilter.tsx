@@ -34,43 +34,42 @@ export default function CompanyFilter({
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-  const params = new URLSearchParams(searchParams.toString());
-  const value = e.target.value;
+    const params = new URLSearchParams(searchParams.toString());
+    const value = e.target.value;
 
-  if (value) {
-    params.set('search', value); // update the selected company
-  } else {
-    params.delete('search'); // remove filter if nothing selected
-  }
+    if (value) {
+      params.set('search', value);
+    } else {
+      params.delete('search');
+    }
+    params.set('page', '1');
 
-  params.set('page', '1'); // reset to page 1 on search/filter
-
-  router.push(`/tender?${params.toString()}`);
-};
+    router.push(`/tender?${params.toString()}`);
+  };
 
   return (
-    <section className='w-full mx-auto py-6 flex justify-between items-center'>
-    <input 
-    type='search' 
-    placeholder='enter company name' 
-    onChange={handleSearch} 
-    className='border w-[350px] h-[50px] shadow rounded px-2'
-    />
-    <div className="w-full max-w-xs">
-      <label className="block mb-1 text-sm font-medium">Filter by Company</label>
-      <select
-        value={selectedCompanyId}
-        onChange={handleChange}
-        className="w-full border border-gray-300 rounded p-2"
-      >
-        <option value="">All Companies</option>
-        {companies.map((company) => (
-          <option key={company.id} value={company.id}>
-            {company.name}
-          </option>
-        ))}
-      </select>
-    </div>
+    <section className='w-full mx-auto py-6 flex justify-between items-center max-md:flex-col gap-4'>
+      <input
+        type='search'
+        placeholder='enter company name'
+        onChange={handleSearch}
+        className='border w-[350px] h-[50px] shadow rounded px-2 max-[400px]:w-full'
+      />
+      <div className="w-full max-w-xs ">
+        <label className="block mb-1 text-sm font-medium">Filter by Company</label>
+        <select
+          value={selectedCompanyId}
+          onChange={handleChange}
+          className="w-full border border-gray-300 rounded p-2"
+        >
+          <option value="">All Companies</option>
+          {companies.map((company) => (
+            <option key={company.id} value={company.id}>
+              {company.name}
+            </option>
+          ))}
+        </select>
+      </div>
     </section>
   );
 }

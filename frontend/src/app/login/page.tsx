@@ -42,8 +42,8 @@ const LoginPage = () => {
 
   return (
     <>
-      <main className="max-w-[1280px] mx-auto h-[calc(100dvh_-_60px)] flex py-23 max-lg:flex-col">
-        <section className="w-1/2 flex flex-col justify-center gap-5">
+      <main className="max-w-[1280px] mx-auto min-h-[calc(100dvh_-_60px)] flex items-center py-23 px-6 max-lg:flex-col max-lg:gap-10  ">
+        <section className="w-1/2 flex flex-col justify-center gap-5 max-md:w-full">
           <h2 className="text-4xl font-bold text-center">Login</h2>
           <p className="text-zinc-500 text-center text-xl">Sign in to your account</p>
 
@@ -82,7 +82,7 @@ const LoginPage = () => {
           </form>
         </section>
 
-        <section className="w-1/2 flex items-center justify-center">
+        <section className="w-1/2 h-[500px] flex items-center justify-center max-md:w-full">
           <img src='/images/login-image.png' alt='login photo' className='w-full h-full object-center'/>
         </section>
       </main>
