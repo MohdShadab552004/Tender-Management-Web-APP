@@ -23,7 +23,7 @@ const CreateTenderPage = () => {
     };
 
     try {
-      const res = await fetch('http://localhost:8080/tender/create', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tender/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

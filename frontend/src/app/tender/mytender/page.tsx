@@ -39,9 +39,9 @@ const MyTenderPage = () => {
           setLoading(false);
           return;
         }
-        
 
-        const res = await fetch('http://localhost:8080/tender/mytender', {
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tender/mytender`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

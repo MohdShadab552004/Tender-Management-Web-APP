@@ -28,9 +28,10 @@ const ApplyTenderPage = () => {
     const [coverLetter, setCoverLetter] = useState('');
 
     useEffect(() => {
+        console.log(`${process.env.NEXT_PUBLIC_API_URL}/tender/list/${tenderId}`)
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/tender/list/${tenderId}`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tender/list/${tenderId}`, {
                     headers: {
                         'Content-Type': 'application/json',
                     },

@@ -6,7 +6,7 @@ const ApplicationsPage = async ({ params }) => {
    const cookieStore = await cookies();
   const token = await cookieStore.get('token')?.value;
 
-  const res = await fetch(`http://localhost:8080/application/${tenderId}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/application/${tenderId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     }

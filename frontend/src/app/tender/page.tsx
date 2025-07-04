@@ -57,7 +57,7 @@ export default async function TendersPage({
 
   try {
     // Fetch companies
-    const companiesRes = await fetch('http://localhost:8080/companies/all', {
+    const companiesRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/companies/all`, {
       cache: 'no-store',
     });
     companies = await companiesRes.json();

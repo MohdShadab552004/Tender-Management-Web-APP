@@ -24,7 +24,12 @@ export const registerController = async (req, res) => {
       { expiresIn: '1d' }
     );
 
-    res.cookie('token', token);
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: 'None',
+    });
+
     return res.status(201).json({ message: 'User registered successfully' });
 
   } catch (err) {
@@ -54,7 +59,11 @@ export const loginController = async (req, res) => {
       { expiresIn: '1d' }
     );
 
-    res.cookie('token', token);
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: 'None',
+    });
     return res.status(200).json({ message: 'Login successful' });
 
   } catch (err) {

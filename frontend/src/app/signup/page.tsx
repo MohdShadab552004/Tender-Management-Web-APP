@@ -19,7 +19,7 @@ const Page = () => {
   const handleSignupSubmit = async (e: FormEvent) => {
     e.preventDefault();
     console.log("hitting api")
-    const response = await fetch("http://localhost:8080/auth/register", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
       method: 'POST',
       headers: {
         "Content-Type": "application/json",
@@ -43,7 +43,7 @@ const Page = () => {
       formData.append("logo", logo);
     }
 
-    const response = await fetch("http://localhost:8080/companies/create", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/companies/create`, {
       method: 'POST',
       credentials:'include',
       body: formData,
