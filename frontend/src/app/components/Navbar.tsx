@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname, } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import ProfileDropdown from './ProfileDropDown';
-import { IUserProfile } from '../profile/page';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
