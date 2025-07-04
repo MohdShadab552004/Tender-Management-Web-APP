@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import MyTenderCard from '@/app/components/MyTenderCard';
+import MyTenderCard from '../../components/MyTenderCard';
+import ShimmerCards from '../../components/ShimmerCards';
 
 interface TenderType {
   id: number;
@@ -38,6 +39,7 @@ const MyTenderPage = () => {
           setLoading(false);
           return;
         }
+        
 
         const res = await fetch('http://localhost:8080/tender/mytender', {
           headers: {
@@ -66,7 +68,7 @@ const MyTenderPage = () => {
     <div className="max-w-[1280px] min-h-[calc(100dvh_-_60px)] flex flex-col justify-between mx-auto py-10 ">
       <div className="grid grid-cols-3 gap-6 max-lg:grid-cols-2 max-lg:place-items-center max-md:grid-cols-1">
         {loading ? (
-          <p className="text-center text-zinc-500 col-span-full">Loading...</p>
+            <ShimmerCards />
         ) : currentTenders.length > 0 ? (
           currentTenders.map((tender) => (
             <MyTenderCard

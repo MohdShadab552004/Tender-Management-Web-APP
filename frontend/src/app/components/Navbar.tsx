@@ -5,6 +5,11 @@ import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import ProfileDropdown from './ProfileDropDown';
 
+const NAV_LINKS = [
+  { href: '/', label: 'Home' },
+  { href: '/tender', label: 'Tenders' },
+];
+
 const Navbar = () => {
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -26,10 +31,7 @@ const Navbar = () => {
           credentials: 'include',
         });
 
-        if (!res.ok) {
-          throw new Error('Failed to fetch user profile');
-        }
-
+        if (!res.ok) throw new Error('Failed to fetch user profile');
         const data = await res.json();
         setUser(data);
       } catch (err) {
@@ -37,115 +39,108 @@ const Navbar = () => {
       }
     };
 
-    if (isLoggedIn) {
-      fetchUserProfile();
-    }
+    if (isLoggedIn) fetchUserProfile();
   }, [isLoggedIn]);
 
   const isActive = (route: string) => pathname === route;
 
   return (
-    <header className="w-full h-15 mt-2 px-4 border-b bg-white z-50 relative">
-      <nav className="max-w-[1280px] mx-auto h-full flex justify-between items-center py-4">
-        {/* LOGO + DESKTOP NAV */}
-        <div >
-          <div className='flex items-center gap-16'>
-            <Link href="/">
-              <h1 className="font-bold text-2xl">TenderHub</h1>
-            </Link>
+    <header className="w-full border-b bg-white z-50">
+      <nav className="max-w-[1280px] mx-auto flex justify-between items-center px-4 py-4">
+        {/* LEFT: Logo + Nav */}
+        <div className="flex items-center gap-12">
+          <Link href="/">
+            <h1 className="font-bold text-2xl">TenderHub</h1>
+          </Link>
 
-            {/* Desktop Links */}
-            <ul className="hidden md:flex gap-6">
-              <li>
+          <ul className="hidden md:flex gap-6">
+            {NAV_LINKS.map(({ href, label }) => (
+              <li key={href}>
                 <Link
-                  href="/"
-                  className={isActive('/') ? 'font-bold text-black' : 'text-zinc-600 hover:text-black'}
+                  href={href}
+                  className={
+                    isActive(href)
+                      ? 'font-bold text-black'
+                      : 'text-zinc-600 hover:text-black'
+                  }
                 >
-                  Home
+                  {label}
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/tender"
-                  className={isActive('/tender') ? 'font-bold text-black' : 'text-zinc-600 hover:text-black'}
-                >
-                  Tenders
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/companies"
-                  className={isActive('/companies') ? 'font-bold text-black' : 'text-zinc-600 hover:text-black'}
-                >
-                  Companies
-                </Link>
-              </li>
-            </ul>
-          </div>
+            ))}
+          </ul>
         </div>
 
+        {/* RIGHT: Auth or Profile */}
+        <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4">
+            {!isLoggedIn ? (
+              <>
+                <Link href="/login" className="text-zinc-600 hover:text-black">
+                  Log in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="bg-black rounded-2xl py-2 px-5 text-white hover:opacity-90"
+                >
+                  Sign up
+                </Link>
+              </>
+            ) : (
+              user && <ProfileDropdown user={user} />
+            )}
+          </div>
 
-        {/* Desktop Auth Buttons */}
-        <section className='flex items-center gap-5'>
-        <div className="">
-          {!isLoggedIn ? (
-            <>
+          {/* Hamburger (mobile) */}
+          <button
+            className="md:hidden text-2xl text-black"
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+          >
+            ☰
+          </button>
+
+          {/* Mobile Profile (if logged in) */}
+          {isLoggedIn && user && (
+            <div className="md:hidden">
+              <ProfileDropdown user={user} />
+            </div>
+          )}
+        </div>
+      </nav>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-white shadow-md border-t py-4 px-6 space-y-4">
+          <ul className="space-y-2">
+            {NAV_LINKS.map(({ href, label }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className={
+                    isActive(href)
+                      ? 'font-bold text-black'
+                      : 'text-zinc-600 hover:text-black'
+                  }
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {!isLoggedIn && (
+            <div className="flex flex-col gap-2 pt-2">
               <Link href="/login" className="text-zinc-600 hover:text-black">
                 Log in
               </Link>
               <Link
                 href="/signup"
-                className="bg-black rounded-2xl py-2 px-5 text-white hover:opacity-90"
+                className="bg-black rounded-2xl py-2 px-5 text-white hover:opacity-90 w-fit"
               >
                 Sign up
               </Link>
-            </>
-          ) : (
-            user && <ProfileDropdown user={user} />
+            </div>
           )}
-        </div>
-
-        {/* Hamburger Icon */}
-        <button
-          className="md:hidden text-2xl text-black"
-          onClick={() => setIsMenuOpen((prev) => !prev)}
-        >
-          ☰
-        </button>
-        </section>
-      </nav>
-
-      {/* MOBILE MENU */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white shadow-md border-t py-4 px-6 space-y-4">
-          <ul className="space-y-2">
-            <li>
-              <Link
-                href="/"
-                className={isActive('/') ? 'font-bold text-black' : 'text-zinc-600 hover:text-black'}
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/tender"
-                className={isActive('/tender') ? 'font-bold text-black' : 'text-zinc-600 hover:text-black'}
-              >
-                Tenders
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/companies"
-                className={isActive('/companies') ? 'font-bold text-black' : 'text-zinc-600 hover:text-black'}
-              >
-                Companies
-              </Link>
-            </li>
-          </ul>
-
-
         </div>
       )}
     </header>
