@@ -87,7 +87,7 @@ const Navbar = () => {
                 </Link>
               </>
             ) : (
-              user && <ProfileDropdown user={user} />
+              user && <ProfileDropdown user={user} setIsLoggedIn={setIsLoggedIn}/>
             )}
           </div>
 
@@ -102,7 +102,7 @@ const Navbar = () => {
           {/* Mobile Profile (if logged in) */}
           {isLoggedIn && user && (
             <div className="md:hidden">
-              <ProfileDropdown user={user} />
+              <ProfileDropdown user={user} setIsLoggedIn={setIsLoggedIn}/>
             </div>
           )}
         </div>

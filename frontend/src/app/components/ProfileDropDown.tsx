@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { set } from 'react-hook-form';
 
 interface ProfileDropdownProps {
   user: {
@@ -11,9 +12,10 @@ interface ProfileDropdownProps {
       logo_url?: string;
     };
   };
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user }) => {
+const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, setIsLoggedIn }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -22,7 +24,8 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user }) => {
 
   const handleLogout = () => {
     document.cookie = 'token=; Max-Age=0';
-    router.push('/login');
+    setIsLoggedIn(false);
+    router.push('/');
   };
 
   useEffect(() => {
