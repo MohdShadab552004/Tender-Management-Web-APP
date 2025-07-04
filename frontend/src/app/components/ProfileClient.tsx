@@ -2,22 +2,43 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 
-interface ProfileClientProps {
-  user: any;
-  setUser: React.Dispatch<React.SetStateAction<any>>;
+
+interface UserProfile {
+  email: string;
+  joined?: string;
+  totalBidding: number;
+  company: {
+    name: string;
+    industry: string;
+    description: string;
+    logo_url?: string;
+    tendersPosted?: number;
+    applicationsSent?: number;
+  };
 }
+
+interface ProfileClientProps {
+  user: UserProfile;
+  setUser: React.Dispatch<React.SetStateAction<UserProfile>>;
+}
+
+
 
 const ProfileClient: React.FC<ProfileClientProps> = ({ user, setUser }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    email: user.email || '',
+  const [formData, setFormData] = useState<UserProfile>({
+    email: user.email,
     company: {
       name: user.company?.name || '',
       industry: user.company?.industry || '',
       description: user.company?.description || '',
+      logo_url: user.company?.logo_url || '',
+      tendersPosted: user.company?.tendersPosted || 0,
+      applicationsSent: user.company?.applicationsSent || 0,
     },
-    totalBidding: user.totalBidding || 0
+    totalBidding: user.totalBidding || 0,
   });
+
 
   const handleEdit = () => setIsEditing(true);
   const handleClose = () => setIsEditing(false);

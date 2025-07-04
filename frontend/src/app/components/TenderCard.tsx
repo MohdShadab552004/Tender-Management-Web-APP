@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface TenderCardProps {
   id:number;
@@ -25,10 +26,12 @@ const TenderCard: React.FC<TenderCardProps> = ({
       
       {/* Company Info */}
       <div className="flex items-center gap-3 mb-4">
-        <img
+        <Image
           src={companylogourl}
           alt={`${companyname} logo`}
-          className="w-10 h-10 object-cover rounded-full border"
+          width={40}
+          height={40}
+          className="rounded-full border"
         />
         <div className="text-sm">
           <p className="font-semibold text-black">{companyname}</p>

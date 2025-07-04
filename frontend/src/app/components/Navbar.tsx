@@ -12,7 +12,6 @@ const NAV_LINKS = [
 
 const Navbar = () => {
   const pathname = usePathname();
-  const router = useRouter();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<any>(null);

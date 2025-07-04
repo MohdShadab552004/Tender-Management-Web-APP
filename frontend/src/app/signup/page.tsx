@@ -41,8 +41,12 @@ const Page = () => {
       if (!response.ok) throw new Error(data.message || 'Signup failed');
 
       setIsSignUp(true);
-    } catch (err: any) {
-      alert(err.message || 'Something went wrong');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message || 'Something went wrong');
+      } else {
+        alert('Something went wrong');
+      }
     } finally {
       setLoading(false);
     }
@@ -75,8 +79,12 @@ const Page = () => {
       if (!response.ok) throw new Error(data.message || 'Company creation failed');
 
       router.push('/');
-    } catch (err: any) {
-      alert(err.message || 'Something went wrong');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message || 'Something went wrong');
+      } else {
+        alert('Something went wrong');
+      }
     } finally {
       setLoading(false);
     }

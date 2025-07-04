@@ -4,11 +4,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import InputField from '../components/InputField';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false); // 🌀 loading state
+  const [loading, setLoading] = useState(false);
+  const router = useRouter(); 
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,8 +20,7 @@ const LoginPage = () => {
       return;
     }
 
-    setLoading(true); // Start loading
-
+    setLoading(true); 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         method: 'POST',
@@ -36,11 +37,15 @@ const LoginPage = () => {
         throw new Error(data.message || 'Login failed');
       }
 
-      window.location.href = '/';
-    } catch (err: any) {
-      alert(err.message || 'Something went wrong');
+      router.push('/'); 
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message || 'Something went wrong');
+      } else {
+        alert('Something went wrong');
+      }
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 

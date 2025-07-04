@@ -57,10 +57,12 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, setIsLoggedIn }
         <div className="absolute top-14 right-0 bg-white rounded-xl shadow-lg w-[280px] z-50">
 
           <div className="flex gap-4 items-center p-4 border-b">
-            <img
+            <Image
+              width={48}
+              height={48}
               src={user.company?.logo_url || '/images/hero-images.png'}
               alt="Profile"
-              className="w-12 h-12 rounded-full object-cover"
+              className="rounded-full object-cover"
             />
             <div>
               <h2 className="font-semibold">{user.company?.name}</h2>
