@@ -9,7 +9,7 @@ import { companySchema } from '../validation/companySchema.js';
 
 const companiesRoutes = Router();
 
-companiesRoutes.post('/create', authenticate, validate(companySchema), upload.single('logo'), createCompaniesController);
+companiesRoutes.post('/create', authenticate, upload.single('logo'),  validate(companySchema),createCompaniesController);
 companiesRoutes.get('/search', searchCompaniesController);
 companiesRoutes.get('/all',allCompaniesController);
 

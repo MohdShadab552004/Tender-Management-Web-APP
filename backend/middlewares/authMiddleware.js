@@ -10,6 +10,8 @@ export const authenticate = (req, res, next) => {
   if (!token && req.cookies?.token) {
     token = req.cookies.token;
   }
+
+  
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
